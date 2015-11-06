@@ -1,55 +1,43 @@
 %{
-#include "compiler-parser.h"
+
+#include <stdio.h>
 #include <string.h>
-#include "global.h"
-#include "util.h"
 extern YYSTYPE yylval;
+
 %}
 
-%option 8bit
-%option warn nodefault
-%option yylineno noyywrap
-
-ws  [[:blank:]\n]*
-identifier  [[:alpha:]][[:alnum:]]*
-number  0|[1-9][0-9]*
+id [_a-zA-Z][a-zA-Z0-9_]*
+digito	[0-9]
+numero	{digito}+
 
 %%
 
-"e"           return AND;
-"ou"          return OR;
-"se"          return IF;
-"senao"       return ELSE;
-"enquanto"    return WHILE;
-"leia"        return READ;
-"escreva"     return WRITE;
-"fim"         return END;
-"=="          return EQ;
-"!="          return NEQ;
-"="           return ATTR;
-">="          return GE;
-">"           return GT;
-"<="          return LE;
-"<"           return LT;
-"+"           return PLUS;
-"-"           return MINUS;
-"*"           return TIMES;
-"/"           return OVER;
-";"           return SEMI;
-"("           return LPAREN;
-")"           return RPAREN;
-{number}      {
-                yylval.token = new_token();
-								(yylval.token)->value.val = atoi(yytext);
-                return NUM;
-              }
-{identifier}  {
-                yylval.token = new_token();
-								(yylval.token)->value.name = copy_str (yytext);
-								(yylval.token)->lineno = yylineno;
-                return ID;
-              }
-{ws}          /* ignore */;
+[\n]	//Ignora o ENTER
 
-.             printf("bad input character '%s' at line %d\n", yytext, yylineno);
+[\t ]+	//Ignora o TAB
 
+"if"		return IF;
+"then"		return THEN;
+"else"		return ELSE;
+"while"		return WHILE;
+"+"		return MAIS;
+"-"		return MENOS;
+"*"		return MULT;
+"/"		return DIV;
+"and"		return AND;
+"or"		return OR;
+"=="		return IGUAL;
+"~="		return NEQ;
+"<="		return LE;
+">="		return GE;
+"<"		return MENOR;
+">"		return MAIOR;
+"="		return ATRIBUI;
+"("		return LPAREN;
+")"		return RPAREN;
+{id}		return ID;
+{numero}	{ yylval = atoi(yytext); return NUM;}
+
+.	printf("Erro lexico!\nCaractere nao reconhecido: %s", yytext);
+
+%%
